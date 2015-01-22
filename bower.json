@@ -1,0 +1,25 @@
+{
+  "name": "vaadin-superhero-demo",
+  "version": "0.1.0",
+  "authors": [
+    "Artur Signell <artur@vaadin.com>"
+  ],
+  "main": "index.html",
+  "license": "Apache2",
+  "homepage": "http://vaadin.com",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "vaadin-components": "~0.1.0",
+    "google-map": "~0.4.0",
+    "voice-elements": "~0.2.0",
+    "core-style": "polymer/core-style#~0.5.3",
+    "core-ajax": "polymer/core-ajax#~0.5.3",
+    "core-input": "polymer/core-input#~0.5.3"
+  }
+}
