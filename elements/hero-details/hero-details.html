@@ -96,7 +96,7 @@
             this.phone.id = 'phone';
             this.$.phoneButton.parentNode.appendChild(this.phone);
           } else {
-            this.$.phoneButton.disabled = true;
+            this.$.phoneButton.parentNode.removeChild(this.$.phoneButton);
           } 
         },
         pageChanged: function() {
