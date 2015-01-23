@@ -24,6 +24,7 @@
         right: 0;
         height: 100%;
         max-height: 768px;
+        -webkit-transform: translatey(110%);
         transform: translatey(110%);
         transition: all 400ms;
       }
@@ -35,6 +36,7 @@
       :host(.state1) hero-details,
       :host(.state2) hero-details,
       :host(.state2) hero-edit {
+        -webkit-transform: translatey(0%);
         transform: translatey(0%);
       }
 
@@ -55,21 +57,16 @@
       }
 
       #popup {
-        display: flex;
         height: 100%;
       }
 
       #left {
-        align-self: stretch;
-        flex: 1;
         border-right: 1px solid #E2DFDC;
         box-sizing: border-box;
         position: relative;
       }
 
       .map {
-        align-self: stretch;
-        flex: 1;
         position: relative;
       }
 

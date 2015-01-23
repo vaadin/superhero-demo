@@ -29,8 +29,8 @@
         }
       }
     </style>
-    <div id='popup'>
-     <div id="left">
+    <div id='popup' layout horizontal>
+     <div id="left" flex>
         <header layout horizontal center>
           <button on-tap="{{close}}" class="v-button v-button-borderless-colored">Close</button>
           <h3 flex class="no-margin">Superhero</h3>
@@ -76,9 +76,9 @@
           </section>
         </div>
      </div>
-     <div class="map" id="dmap">
+     <div class="map" id="dmap" flex>
        <google-map id='gdmap' zoom="10" fit>
-         <google-map-marker id='gdmark' title="{{hero.name}}" latitude="{{hero.location.latitude}}" longitude="{{hero.location.longitude}}"  draggable="false">{{hero.name}}</google-map-marker>
+         <google-map-marker id='gdmark' title="{{hero.name}}" latitude="{{hero.location.latitude}}" longitude="{{hero.location.longitude}}" draggable="false">{{hero.name}}</google-map-marker>
        </google-map>
        <button class="v-button v-button-primary" on-tap="{{hideMap}}">Close</button>
      </div>
@@ -97,7 +97,7 @@
             this.$.phoneButton.parentNode.appendChild(this.phone);
           } else {
             this.$.phoneButton.parentNode.removeChild(this.$.phoneButton);
-          } 
+          }
         },
         pageChanged: function() {
           if (this.page == 1 && this.hero) {
@@ -128,7 +128,7 @@
           }
           if (this.phone)
             this.phone.text = messages[this.hero.status.toLowerCase()];
-            
+
           var _this = this;
           if (this.phone) {
             setTimeout(function() {
@@ -145,13 +145,8 @@
           this.$.content.scrollTop = 0;
         },
         centerPinOnMap: function() {
-          // This centers the map at the marker
-          this.$.gdmap.fitToMarkers = true;
-          // This refreshes the view, otherwise only few map squares are displayed
-          this.$.dmap.removeChild(this.$.gdmap);
-          this.$.dmap.appendChild(this.$.gdmap);
-          // This allows the user move the map
-          this.$.gdmap.fitToMarkers = false;
+          this.$.gdmap.latitude = this.hero.location.latitude;
+          this.$.gdmap.longitude = this.hero.location.longitude;
         },
         showMap: function() {
           this.$.dmap.classList.add("show-map");
