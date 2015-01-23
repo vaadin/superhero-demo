@@ -41,7 +41,6 @@
             <p class="photo"><img alt="" src="{{hero.photoUrl}}"></p>
             <h3 class="name">{{hero.name}}, a.k.a. <span class="alias">{{hero.heroname}}</span></h3>
             <button on-tap="{{call}}" class="call v-button v-button-primary" id="phoneButton">Call Hero</button>
-            <voice-player id="phone"></voice-player>
           </section>
           <section class="vitals" layout horizontal center>
             <p class="title">Vitals</p>
@@ -88,16 +87,24 @@
   <script>
     (function () {
       Polymer({
+        created: function(){
+          this.phone = null;
+        },
         ready: function() {
-          if (!('speechSynthesis' in window)) {
-            this.$.phoneButton.parentNode.removeChild(this.$.phoneButton);
-          }
+          if (('speechSynthesis' in window)) {
+            this.phone = document.createElement("voice-player");
+            this.phone.id = 'phone';
+            this.$.phoneButton.parentNode.appendChild(this.phone);
+          } else {
+            this.$.phoneButton.disabled = true;
+          } 
         },
         pageChanged: function() {
           if (this.page == 1 && this.hero) {
             this.centerPinOnMap();
           }
-          this.$.phone.cancel();
+          if (this.phone)
+            this.phone.cancel();
         },
         close: function(e) {
           this.page = 0;
@@ -119,18 +126,22 @@
             "vacation": "Hello! You've reached the automatic voice mail of " + this.hero.heroname + ", who is currently enjoying an earned vacation in a secret location. Leave a message after the beep!",
             "on a quest": "This is a message to all my allies to conquer " + this.hero.archenemy + ", I'm going to need the help of all of you!"
           }
-
-          this.$.phone.text = messages[this.hero.status.toLowerCase()];
+          if (this.phone)
+            this.phone.text = messages[this.hero.status.toLowerCase()];
+            
           var _this = this;
-          setTimeout(function() {
-            _this.$.phone.cancel();
-            _this.$.phone.speak();
-          }, 10);
+          if (this.phone) {
+            setTimeout(function() {
+              _this.phone.cancel();
+              _this.phone.speak();
+            }, 10);
+          }
           e.preventDefault();
         },
         heroChanged: function() {
           this.centerPinOnMap();
-          this.$.phone.cancel();
+          if (this.phone)
+            this.phone.cancel();
           this.$.content.scrollTop = 0;
         },
         centerPinOnMap: function() {
