@@ -63,45 +63,30 @@
     </v-grid>
   </template>
   <script>
-  function waitUntil(check, exec) {
-    var id = setInterval(function() {
-      if (r = check()) {
-        clearInterval(id);
-        exec(r);
-      }
-    }, 100);
-  }
-  function waitUntilGridReady(grid, exec) {
-    waitUntil(function() {
-      return grid && grid.dataSource && grid;
-    }, exec);
-  }
-
     (function () {
       Polymer({
         ready: function() {
           var _this = this;
           this.size = 0;
           this.$.ajax.addEventListener('core-response', function(e) {
-            waitUntilGridReady(_this.$.grid, function(grid) {
-                _this.heroes = e.detail.response.heroes;
-                _this.size = _this.heroes.length;
-                grid.rowCount = _this.size;
-                grid.dataSource = _this.heroes;
-                grid.columns[3].renderer = function(element, data, rowIndex) {
-                  element.innerHTML = ("(" + data.latitude + ", " + data.longitude + ")").replace(/(\d\.\d{6})\d+/g,"$1");
-                };
+            var grid = _this.$.grid;
+            _this.heroes = e.detail.response.heroes;
+            _this.size = _this.heroes.length;
+            grid.rowCount = _this.size;
+            grid.dataSource = _this.heroes;
+            grid.columns[3].renderer = function(element, data, rowIndex) {
+              element.innerHTML = ("(" + data.latitude + ", " + data.longitude + ")").replace(/(\d\.\d{6})\d+/g,"$1");
+            };
 
-                grid.columns[2].renderer = function(element, data, rowIndex) {
-                    element.innerHTML = "<hero-sparkline colors='#DF0016,#3777DD' height='12' width='90' points='[[" +
-                                           data.heart + "],[" + data.coffee + "]]' />";
-                  };
+            grid.columns[2].renderer = function(element, data, rowIndex) {
+                element.innerHTML = "<hero-sparkline colors='#DF0016,#3777DD' height='12' width='90' points='[[" +
+                        data.heart + "],[" + data.coffee + "]]' />";
+            };
 
-                window.heroes = _this.heroes;
+            window.heroes = _this.heroes;
 
-                grid.heightMode = "CSS";
-                grid.height = "100%";
-            });
+            grid.heightMode = "CSS";
+            grid.height = "100%";
           });
           this.$.grid.addEventListener("select", function(e) {
             _this.current = _this.$.grid.selectedRow;
