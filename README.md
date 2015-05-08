@@ -1,8 +1,18 @@
-# Example project for Vaadin Components
+# Note: this demo application is *deprecated*
+
+This application is only relevant for Vaadin Components v0.1.2
+
+Please see the main [Vaadin Components GitHub repository](https://github.com/vaadin/components) for up-to-date instructions how to get started using newer versions.
+
+<br>
+<hr>
+
+
+## Example project for Vaadin Components
 
 To run:
 ```
-$ bower install vaadin-components
+$ bower install vaadin-components#0.1.2
 $ serve .
 ```
 Then open [http://localhost:3000](http://localhost:3000/index.html)
