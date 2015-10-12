@@ -1,13 +1,20 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/google-map/google-map.html">
 <link rel="import" href="../../bower_components/voice-elements/dist/voice-player.html">
-<link rel="import" href="../../bower_components/core-style/core-style.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/classes/iron-flex-layout.html">
 <link rel="import" href="../hero-sparkline/hero-sparkline.html">
-
-<polymer-element name="hero-details" attributes="hero page">
-  <template>
-    <core-style ref="hero-panel"></core-style>
-    <style>
+<link rel="import" href="../hero-panel-style/hero-panel-style.html">
+<dom-module id="hero-details">
+  <style>
+      :host {
+        display: block;
+        box-sizing: border-box;
+        border: 1px solid #E2DFDC;
+        box-shadow: 0px -10px 20px 0px rgba(0,0,0,0.07), 0px 1px 3px 0px rgba(0,0,0,0.08);
+        background-color: #fff;
+        z-index: 5000;
+        overflow: hidden;
+      }
       .hero .call {
         position: absolute !important;
         right: 20px;
@@ -29,23 +36,25 @@
         }
       }
     </style>
-    <div id='popup' layout horizontal>
-     <div id="left" flex>
-        <header layout horizontal center>
-          <button on-tap="{{close}}" class="v-button v-button-borderless-colored">Close</button>
-          <h3 flex class="no-margin">Superhero</h3>
-          <button on-tap="{{edit}}" class="v-button v-button-borderless-colored">Edit</button>
+    <style include="hero-panel-style"></style>
+  <template>
+    <div id="popup" class="layout horizontal">
+     <div id="left" class="flex">
+        <header class="layout horizontal center">
+          <button on-tap="close" class="v-button v-button-borderless-colored">Close</button>
+          <h3 class="flex" class="no-margin">Superhero</h3>
+          <button on-tap="edit" class="v-button v-button-borderless-colored">Edit</button>
         </header>
         <div class="content" id="content">
           <section class="hero">
             <p class="photo"><img alt="" src="{{hero.photoUrl}}"></p>
-            <h3 class="name">{{hero.name}}, a.k.a. <span class="alias">{{hero.heroname}}</span></h3>
-            <button on-tap="{{call}}" class="call v-button v-button-primary" id="phoneButton">Call Hero</button>
+            <h3 class="name"><span>{{hero.name}}</span>, a.k.a. <span class="alias">{{hero.heroname}}</span></h3>
+            <button on-tap="call" class="call v-button v-button-primary" id="phoneButton">Call Hero</button>
           </section>
-          <section class="vitals" layout horizontal center>
+          <section class="vitals layout horizontal center">
             <p class="title">Vitals</p>
-            <div flex><hero-sparkline color='#DF0016' height='12' width='90px' points='{{hero.vitals.heart}}'></hero-sparkline><p class="subtitle">Heart rate</p></div>
-            <div flex><hero-sparkline color='#3777DD' height='12' width='90px' points='{{hero.vitals.coffee}}'></hero-sparkline><p class="subtitle">Caffeine</p></div>
+            <div class="flex"><hero-sparkline color="#DF0016" height="12" width="90" points="{{hero.vitals.heart}}"></hero-sparkline><p class="subtitle">Heart rate</p></div>
+            <div class="flex"><hero-sparkline color="#3777DD" height="12" width="90" points="{{hero.vitals.coffee}}"></hero-sparkline><p class="subtitle">Caffeine</p></div>
           </section>
           <section>
             <p class="title">IQ</p>
@@ -53,11 +62,11 @@
           </section>
           <section>
             <p class="title">Height</p>
-            <p class="info">{{hero.height}} cm</p>
+            <p class="info"><span>{{hero.height}}</span> cm</p>
           </section>
           <section>
             <p class="title">Weight</p>
-            <p class="info">{{hero.weight}} kg</p>
+            <p class="info"><span>{{hero.weight}}</span> kg</p>
           </section>
           <section>
             <p class="title">Kill count</p>
@@ -68,7 +77,7 @@
             <p class="info">{{hero.archenemy}}</p>
           </section>
           <section class="location">
-            <button class="v-button v-button-borderless-colored" on-tap="{{showMap}}">Current Location &rsaquo;</button>
+            <button class="v-button v-button-borderless-colored" on-tap="showMap">Current Location ›</button>
           </section>
           <section>
             <p class="title">Mission</p>
@@ -76,85 +85,94 @@
           </section>
         </div>
      </div>
-     <div class="map" id="dmap" flex>
-       <google-map id='gdmap' zoom="10" fit>
-         <google-map-marker id='gdmark' title="{{hero.name}}" latitude="{{hero.location.latitude}}" longitude="{{hero.location.longitude}}" draggable="false">{{hero.name}}</google-map-marker>
+     <div class="map flex" id="dmap">
+       <google-map id="gdmap" zoom="10" class"fit">
+         <google-map-marker id="gdmark" title="{{hero.name}}" latitude="{{hero.location.latitude}}" longitude="{{hero.location.longitude}}" draggable="false">{{hero.name}}</google-map-marker>
        </google-map>
-       <button class="v-button v-button-primary" on-tap="{{hideMap}}">Close</button>
+       <button class="v-button v-button-primary" on-tap="hideMap">Close</button>
      </div>
     </div>
   </template>
   <script>
     (function () {
       Polymer({
-        created: function(){
-          this.phone = null;
-        },
-        ready: function() {
-          if (('speechSynthesis' in window)) {
-            this.phone = document.createElement("voice-player");
-            this.phone.id = 'phone';
-            this.$.phoneButton.parentNode.appendChild(this.phone);
-          } else {
-            this.$.phoneButton.parentNode.removeChild(this.$.phoneButton);
+        is: 'hero-details',
+        properties: {
+          hero: {
+            notify: true,
+            observer: 'heroChanged'
+          },
+          page: {
+            notify: true,
+            observer: 'pageChanged'
           }
         },
-        pageChanged: function() {
+        created: function () {
+          this.phone = null;
+        },
+        ready: function () {
+          if ('speechSynthesis' in window) {
+            this.phone = document.createElement('voice-player');
+            this.set('phone.id', 'phone');
+            Polymer.dom(Polymer.dom(this.$.phoneButton).parentNode).appendChild(this.phone);
+          } else {
+            Polymer.dom(Polymer.dom(this.$.phoneButton).parentNode).removeChild(this.$.phoneButton);
+          }
+        },
+        pageChanged: function () {
           if (this.page == 1 && this.hero) {
             this.centerPinOnMap();
           }
           if (this.phone)
             this.phone.cancel();
         },
-        close: function(e) {
+        close: function (e) {
           this.page = 0;
           e.preventDefault();
         },
-        edit: function(e) {
+        edit: function (e) {
           this.page = 2;
           e.preventDefault();
         },
-        call: function(e) {
+        call: function (e) {
           var messages = {
-            "terminated": "The dialed number cannot be reached.",
-            "on a mission": "You reached me at a bad moment – I'm currently fighting malicious code and evil servers! I'll call you back later!",
-            "sleeping": "Stop bugging me, I need my beauty sleep!!!",
-            "shopping": "Hello my friend! I'm shopping for some awesome new hardware. I'll get you some new toys as well! See ya!",
-            "training": "Really busy now, can't talk. I still need to do 500 more pushups!",
-            "hanging out": "Hey, what's up! If you have nothing important to do, come and stop by my place!",
-            "exhausted": "Sorry, I'm not really in the mood for talking right now!",
-            "vacation": "Hello! You've reached the automatic voice mail of " + this.hero.heroname + ", who is currently enjoying an earned vacation in a secret location. Leave a message after the beep!",
-            "on a quest": "This is a message to all my allies to conquer " + this.hero.archenemy + ", I'm going to need the help of all of you!"
-          }
+            'terminated': 'The dialed number cannot be reached.',
+            'on a mission': 'You reached me at a bad moment \u2013 I\'m currently fighting malicious code and evil servers! I\'ll call you back later!',
+            'sleeping': 'Stop bugging me, I need my beauty sleep!!!',
+            'shopping': 'Hello my friend! I\'m shopping for some awesome new hardware. I\'ll get you some new toys as well! See ya!',
+            'training': 'Really busy now, can\'t talk. I still need to do 500 more pushups!',
+            'hanging out': 'Hey, what\'s up! If you have nothing important to do, come and stop by my place!',
+            'exhausted': 'Sorry, I\'m not really in the mood for talking right now!',
+            'vacation': 'Hello! You\'ve reached the automatic voice mail of ' + this.hero.heroname + ', who is currently enjoying an earned vacation in a secret location. Leave a message after the beep!',
+            'on a quest': 'This is a message to all my allies to conquer ' + this.hero.archenemy + ', I\'m going to need the help of all of you!'
+          };
           if (this.phone)
-            this.phone.text = messages[this.hero.status.toLowerCase()];
-
-          var _this = this;
+            this.set('phone.text', messages[this.hero.status.toLowerCase()]);
           if (this.phone) {
-            setTimeout(function() {
-              _this.phone.cancel();
-              _this.phone.speak();
-            }, 10);
+            setTimeout(function () {
+              this.phone.cancel();
+              this.phone.speak();
+            }.bind(this), 10);
           }
           e.preventDefault();
         },
-        heroChanged: function() {
+        heroChanged: function () {
           this.centerPinOnMap();
           if (this.phone)
             this.phone.cancel();
-          this.$.content.scrollTop = 0;
+          this.set('$.content.scrollTop', 0);
         },
-        centerPinOnMap: function() {
-          this.$.gdmap.latitude = this.hero.location.latitude;
-          this.$.gdmap.longitude = this.hero.location.longitude;
+        centerPinOnMap: function () {
+          this.set('$.gdmap.latitude', this.hero.location.latitude);
+          this.set('$.gdmap.longitude', this.hero.location.longitude);
         },
-        showMap: function() {
-          this.$.dmap.classList.add("show-map");
+        showMap: function () {
+          Polymer.dom(this.$.dmap).classList.add('show-map');
         },
-        hideMap: function() {
-          this.$.dmap.classList.remove("show-map");
+        hideMap: function () {
+          Polymer.dom(this.$.dmap).classList.remove('show-map');
         }
       });
-    })();
+    }());
   </script>
-</polymer-element>
+</dom-module>

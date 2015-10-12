@@ -1,10 +1,9 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../bower_components/core-ajax/core-ajax.html">
-<link rel="import" href="../../bower_components/vaadin-components/vaadin-components.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../../bower_components/vaadin-grid/vaadin-grid.html">
 <link rel="import" href="../hero-sparkline/hero-sparkline.html">
-<polymer-element name="hero-list" attributes="hero heroes current page">
-  <template>
-    <style>
+<dom-module id="hero-list">
+  <style>
       .labels {
         position: relative;
         padding: 1em 20px;
@@ -21,93 +20,80 @@
           padding-top: 0.3em;
         }
       }
-      v-grid {
+      vaadin-grid {
         position: relative;
-      }
-      v-grid > div {
-        position: absolute;
-        top: 0;
-        right: 0;
-        bottom: 0;
-        left: 0;
-      }
-      v-grid > div > div {
-        /* fix grid size */
-        width: 100% !important;
-        height: 100% !important;
+        width: 100%;
+        height: 100%;
+        font: inherit;
       }
     </style>
-    <core-ajax
-     auto = "true"
-     url = "../../rest/list.json"
-     handleAs ="json"
-     method="GET"
-     id='ajax'
-     ></core-ajax>
+  <template>
+    <iron-ajax auto url="../../rest/list.json" handle-as="json" method="GET" id="ajax"></iron-ajax>
     <div class="labels">
       <div class="v-label v-label-h2 no-margin">Superhero Roster</div>
-      <div class="v-label v-label-h3 v-label-light no-margin right">{{size}} heroes on duty</div>
+      <div class="v-label v-label-h3 v-label-light no-margin right"><span>{{size}}</span> heroes on duty</div>
     </div>
-    <v-grid flex id='grid'>
+    <vaadin-grid flex="" id="grid">
     <table>
-      <thead>
-        <tr>
-          <th name='rank'>Rank</th>
-          <th name='heroname'>Name</th>
-          <th name='vitals'>Vitals</th>
-          <th name='location'>Location</th>
-          <th name='status'>Status</th>
-        </tr>
-      </thead>
-     </table>
-    </v-grid>
+      <colgroup>
+        <col name="rank" header-text="Rank">
+        <col name="heroname" header-text="Name">
+        <col name="vitals" header-text="Vitals">
+        <col name="location" header-text="Location">
+        <col name="status" header-text="Status">
+      </colgroup>
+    </table>
+    </vaadin-grid>
   </template>
   <script>
     (function () {
       Polymer({
+        is: 'hero-list',
+        properties: {
+          current: { notify: true },
+          hero: { notify: true },
+          heroes: { notify: true },
+          page: {
+            notify: true,
+            observer: 'pageChanged'
+          }
+        },
         ready: function() {
-          var _this = this;
           this.size = 0;
-          this.$.ajax.addEventListener('core-response', function(e) {
-            var grid = _this.$.grid;
-            _this.heroes = e.detail.response.heroes;
-            _this.size = _this.heroes.length;
-            grid.rowCount = _this.size;
-            grid.dataSource = _this.heroes;
-            grid.columns[3].renderer = function(element, data, rowIndex) {
-              element.innerHTML = ("(" + data.latitude + ", " + data.longitude + ")").replace(/(\d\.\d{6})\d+/g,"$1");
+          this.$.ajax.addEventListener('response', function(e) {
+            this.heroes = e.detail.response.heroes;
+            this.size = this.heroes.length;
+
+            var grid = this.$.grid;
+            grid.columns[3].renderer = function(cell) {
+              cell.element.innerHTML = ('(' + cell.data.latitude + ', ' + cell.data.longitude + ')').replace(/(\d\.\d{6})\d+/g, '$1');
             };
-
-            grid.columns[2].renderer = function(element, data, rowIndex) {
-                element.innerHTML = "<hero-sparkline colors='#DF0016,#3777DD' height='12' width='90' points='[[" +
-                        data.heart + "],[" + data.coffee + "]]' />";
+            grid.columns[2].renderer = function(cell) {
+              cell.element.innerHTML = '<hero-sparkline colors="#DF0016,#3777DD" height="12" width="90" points="[[' + cell.data.heart + '],[' + cell.data.coffee + ']]"></hero-sparkline>';
             };
+            grid.items = this.heroes;
+            window.heroes = this.heroes;
+          }.bind(this));
 
-            window.heroes = _this.heroes;
-
-            grid.heightMode = "CSS";
-            grid.height = "100%";
-          });
-          this.$.grid.addEventListener("select", function(e) {
-            _this.current = _this.$.grid.selectedRow;
-            if (_this.heroes && _this.current >= 0) {
-              _this.page = 1;
-              _this.hero = _this.heroes[_this.current];
+          this.$.grid.addEventListener('select', function(e) {
+            this.current = this.$.grid.selection.selected()[0];
+            if (this.heroes && this.current >= 0) {
+              this.page = 1;
+              this.hero = this.heroes[this.current];
             } else {
-              _this.page = 0;
+              this.page = 0;
             }
-          });
+        }.bind(this));
         },
         pageChanged: function() {
           if (this.page == -1) {
             this.size = this.heroes.length;
             this.$.grid.refresh();
-          } else if (this.page == 0) {
-            this.$.grid.setSelectedRow(-1);
-            this.$.grid.querySelector(".v-grid").focus();
+          } else if (this.page === 0) {
+            this.$.grid.selection.clear();
           }
-        },
+        }
       });
-    })();
+    }());
   </script>
-</polymer-element>
+</dom-module>

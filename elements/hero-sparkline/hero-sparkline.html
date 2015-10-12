@@ -1,20 +1,30 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 
-<polymer-element name="hero-sparkline" attributes='points width height color colors'>
-  <template>
-    <style>
+<dom-module id="hero-sparkline">
+  <style>
       :host {
         display: inline-block;
       }
     </style>
-    <canvas id='canvas' width='{{width}}' height='{{height}}'></canvas>
+  <template>
+    <canvas id="canvas" width="{{width}}" height="{{height}}"></canvas>
   </template>
   <script>
     Polymer({
-      pointsChanged: function() {
+      is: 'hero-sparkline',
+      properties: {
+        color: { notify: true },
+        colors: { notify: true },
+        height: { notify: true },
+        points: {
+          notify: true,
+          observer: 'pointsChanged'
+        },
+        width: { notify: true }
+      },
+      pointsChanged: function () {
         // Valid cases: blue or #000,#fff or ["pink","blue"]
-        var colors = (this.colors || this.color).replace(/[\[\]\s\"\']/g,"").split(',');
-
+        var colors = (this.colors || this.color).replace(/[\[\]\s\"\']/g, '').split(',');
         // Valid cases cases: 1,2,3 or [1,2,3] or [[1,2,3],[4,5,6],[7,8,9]]
         var data = this.points;
         if (typeof data == 'string') {
@@ -23,7 +33,6 @@
         } else if (data && data.length && typeof data[0] == 'number') {
           data = [data];
         }
-
         clear(this.$.canvas);
         for (k in data) {
           drawLine(this.$.canvas, data[k], this.width, this.height, colors[k]);
@@ -32,21 +41,13 @@
     });
     function clear(canvas) {
       var ctx = canvas.getContext('2d');
-      ctx.clearRect (0, 0, canvas.width, canvas.height)
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
     }
-
     function drawLine(canvas, data, width, height, color) {
-      var ctx = canvas.getContext('2d'),
-      len = data.length,
-      w = canvas.width,
-      h = canvas.height,
-      _max = Math.max.apply(Math, data),
-      _min = Math.min.apply(Math, data),
-      sx = w / len,
-      x = 0;
+      var ctx = canvas.getContext('2d'), len = data.length, w = canvas.width, h = canvas.height, _max = Math.max.apply(Math, data), _min = Math.min.apply(Math, data), sx = w / len, x = 0;
       ctx.strokeStyle = color || 'black';
       ctx.beginPath();
-      ctx.lineWidth=1;
+      ctx.lineWidth = 1;
       for (var i = 0; i < len; ++i) {
         var n = Number(data[i]) - _min;
         ctx.lineTo(x += sx, h - h * (n / (_max - _min)));
@@ -54,4 +55,4 @@
       ctx.stroke();
     }
   </script>
-</polymer-element>
+</dom-module>
