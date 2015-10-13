@@ -151,10 +151,6 @@
             notify: true,
             observer: 'currentChanged'
           },
-          heroes: {
-            notify: true,
-            observer: 'heroesChanged'
-          },
           page: {
             notify: true,
             observer: 'pageChanged'
@@ -180,6 +176,7 @@
             this.set('heroes' + ('.' + this.current) + ('.' + k), this.hero[k]);
           }
           this.page = 1;
+          this.fire('hero-saved', { index: this.current });
         },
         terminate: function () {
           this.set('heroes' + ('.' + this.current) + '.status', 'Terminated');

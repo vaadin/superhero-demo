@@ -53,6 +53,15 @@
       properties: { page: { observer: 'pageChanged' } },
       ready: function() {
         // Center the map on madrid
+        this.resetHero();
+        this.page = 0;
+
+        document.addEventListener('hero-saved', function(e) {
+          this.resetHero();
+          this.hero = heroes[e.detail.index];
+        }.bind(this));
+      },
+      resetHero: function() {
         this.hero = {
           location: {
             latitude: 40.4378271,
@@ -60,7 +69,6 @@
           },
           photoUrl: ''
         };
-        this.page = 0;
       },
       pageChanged: function() {
         Polymer.dom(this).classList.remove('state0', 'state1', 'state2');
