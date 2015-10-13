@@ -93,7 +93,7 @@
           <div class="flex"><hero-sparkline color="#DF0016" height="12" width="90" points="{{hero.vitals.heart}}"></hero-sparkline><p class="subtitle">Heart rate</p></div>
           <div class="flex">
             <div>
-              <div><span>{{_computeExpression1(caffeine)}}</span> % <button class="v-button v-button-primary v-button-tiny" on-tap="inject">Inject</button></div>
+              <div><span>{{_computeCaffeine(caffeine)}}</span> % <button class="v-button v-button-primary v-button-tiny" on-tap="inject">Inject</button></div>
             </div>
             <p class="subtitle">Caffeine</p>
           </div>
@@ -118,8 +118,8 @@
           <p class="title">Arch-enemy</p>
           <p class="info">
             <select value="{{hero.archenemy::input}}">
-              <template is="dom-repeat" items="{{options}}">
-                <option>{{item}}</option>
+              <template is="dom-repeat" items="{{heroes}}">
+                <option>{{item.heroname}}</option>
               </template>
             </select>
           </p>
@@ -144,7 +144,6 @@
     </div>
   </div></template>
   <script>
-    (function () {
       Polymer({
         is: 'hero-edit',
         properties: {
@@ -159,8 +158,7 @@
           page: {
             notify: true,
             observer: 'pageChanged'
-          },
-          options: Array
+          }
         },
         currentChanged: function () {
           this.hero = this.current >= 0 ? this.heroes[this.current] : { photoUrl: '' };
@@ -174,12 +172,6 @@
           this.set('$.content.scrollTop', 0);
           this.centerPinOnMap();
         },
-        heroesChanged: function () {
-          this.options = [];
-          for (var i in this.heroes) {
-            this.push('options', this.heroes[i].heroname);
-          }
-        },
         cancel: function () {
           this.page = 1;
         },
@@ -189,12 +181,7 @@
           }
           this.page = 1;
         },
-        remove: function () {
-          this.heroes.splice(this.current, 1);
-          this.page = -1;
-        },
         terminate: function () {
-          // TODO: ask if terminated means remove or just change status
           this.set('heroes' + ('.' + this.current) + '.status', 'Terminated');
           this.page = 0;
         },
@@ -215,10 +202,9 @@
         hideMap: function () {
           Polymer.dom(this.$.emap).classList.remove('show-map');
         },
-        _computeExpression1: function (caffeine) {
+        _computeCaffeine: function (caffeine) {
           return caffeine * 100;
         }
       });
-    }());
   </script>
 </dom-module>

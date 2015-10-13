@@ -94,7 +94,6 @@
     </div>
   </template>
   <script>
-    (function () {
       Polymer({
         is: 'hero-details',
         properties: {
@@ -121,6 +120,7 @@
         },
         pageChanged: function () {
           if (this.page == 1 && this.hero) {
+
             this.centerPinOnMap();
           }
           if (this.phone)
@@ -173,6 +173,5 @@
           Polymer.dom(this.$.dmap).classList.remove('show-map');
         }
       });
-    }());
   </script>
 </dom-module>
