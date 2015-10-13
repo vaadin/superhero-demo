@@ -18,11 +18,19 @@
         height: { notify: true },
         points: {
           notify: true,
-          observer: 'pointsChanged'
+          observer: 'drawLines'
         },
         width: { notify: true }
       },
-      pointsChanged: function () {
+      ready: function() {
+          this.drawLines();
+      },
+      drawLines: function () {
+        if ((this.colors || this.color) === undefined) {
+            // Draw nothing if no color(s) defines.
+            return;
+        }
+
         // Valid cases: blue or #000,#fff or ["pink","blue"]
         var colors = (this.colors || this.color).replace(/[\[\]\s\"\']/g, '').split(',');
         // Valid cases cases: 1,2,3 or [1,2,3] or [[1,2,3],[4,5,6],[7,8,9]]
