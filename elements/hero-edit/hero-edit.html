@@ -163,7 +163,7 @@
           options: Array
         },
         currentChanged: function () {
-          this.hero = this.current >= 0 ? this.heroes[this.current] : {};
+          this.hero = this.current >= 0 ? this.heroes[this.current] : { photoUrl: '' };
         },
         pageChanged: function () {
           if (this.page == 2) {
