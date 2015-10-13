@@ -29,12 +29,12 @@
         var data = this.points;
         if (typeof data == 'string') {
           var json = data.charAt(0) != '[' ? '[' + data + ']' : data;
-          var data = JSON.parse(json);
+          data = JSON.parse(json);
         } else if (data && data.length && typeof data[0] == 'number') {
           data = [data];
         }
         clear(this.$.canvas);
-        for (k in data) {
+        for (var k in data) {
           drawLine(this.$.canvas, data[k], this.width, this.height, colors[k]);
         }
       }
