@@ -14,5 +14,5 @@ If you do not have Bower, see its installation [instructions](http://bower.io/#i
 If you do not have Serve, deploy the files using any HTTP server or
 install [serve](https://www.npmjs.com/package/serve).
 
-<small>Note that opening the files locally won't work because browsers tend
-to block HTML imports from file:// URLs.</small>
+Note that opening the files locally won't work because browsers tend
+to block HTML imports from file:// URLs.
